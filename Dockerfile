@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=build /app/target/order-ms-*.jar /app/order-ms.jar
 
 # Expose the port your app runs on (replace with your actual port)
-EXPOSE 8080
+EXPOSE 8083
 
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/order-ms.jar"]
