@@ -1,16 +1,24 @@
 pipeline {
     agent any
+
+    tools {
+        jdk "jdk"
+    }
+
     environment {
-        DOCKER_IMAGE = "neeraj06092024/orderms"
+        DOCKER_IMAGE = "jimmychl/orderms"
+        // KUBE_CONFIG = "/home/ubuntu/.kube/config"
+        DOCKER_C_ID = "1af92dc4-e886-4c75-9a51-e9d2fea061b8"
         KUBE_CONFIG = "/home/ubuntu/.kube/config"
-        AWS_REGION = "eu-central-1"
+        AWS_REGION = "us-east-2"
         EKS_CLUSTER_NAME = "order-cluster"
-        
+
+
     }
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/neerajbalodi/order-ms.git'
+                git branch: 'main', url: 'https://github.com/JimmyCHL/order-ms.git'
             }
         }
         stage('Build & Test') {
@@ -28,7 +36,7 @@ pipeline {
                     sh 'docker build -t $DOCKER_IMAGE:latest .'
 
                     // Login to DockerHub
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: DOCKER_C_ID , usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     }
 
@@ -42,7 +50,7 @@ pipeline {
         script {
             withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
-                credentialsId: 'aws-creds',  // Jenkins credential ID for AWS keys
+                credentialsId: 'd8112ed0-8b5d-46bf-a101-0c9f3bc31376',  // Jenkins credential ID for AWS keys
                 accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
             ]]) {
@@ -58,7 +66,7 @@ pipeline {
                 """
             }
         }
-    }
-}
+        }
+        }
     }
 }
